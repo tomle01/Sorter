@@ -49,37 +49,31 @@ public class Sorting {
         });
     }
 
-    // No usage
-    class Sortbyroll implements Comparator<Box> // Clueless
-    {
-        // Used for sorting in ascending order of
-        // roll number
-        public int compare(Box a, Box b) {
-            return a.getId() - b.getId();
+    ArrayList listToStack(List<Box> OneEachList, List<Box> BoxList, int numberOfBill, double maxWeight) {
+        // Create necessary amount of stacks first
+        ArrayList<Stack> stackArray = new ArrayList<>();
+        for (int i = 0; i < numberOfBill; i++) {
+            stackArray.add(new Stack(BoxList, maxWeight));
         }
-    }
+        // Deal with first list with lots of duplicate box first
 
-    void listToStack(List<Box> list, int numberOfBill, double maxWeight) {
-        System.out.println("Before sorting:" + list);
-        sortMilkHeavyFirst(list);
-        System.out.println("Descending Milk - sorted list:" + list);
-        Stack[] stackArray = new Stack[numberOfBill];
-        for (int i = 0; i < stackArray.length; i++) {
-            stackArray[i] = new Stack(list,maxWeight);
-        }
+
+        // Process the BoxList
+        sortMilkHeavyFirst(BoxList);
         for (Stack i: stackArray) {
             i.pushMilk();
         }
         // Sort list heavy weight first
-        sortWeightHeavyFirst(list);
+        sortWeightHeavyFirst(BoxList);
         for (Stack i: stackArray) {
             i.pushWeight();
         }
         int i = 1; // counter
         for (Stack s : stackArray) {
             System.out.println("Information for Stack number: " + i);
-            System.out.println(s.toString());
+            System.out.print(s.toString());
             i++;
         }
+        return stackArray;
     }
 }

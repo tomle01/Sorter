@@ -7,7 +7,7 @@ public class Stack {
     private int top;
     private Box a[] = new Box[MAX]; // Maximum size of Stack
     private double totWeight, totMilk;
-    private ArrayList<Box> contentObj = new ArrayList<>();
+    private ArrayList<Box> BoxesInStack = new ArrayList<>();
 
     private List<Box> list; private double maxWeight;
 
@@ -61,13 +61,13 @@ public class Stack {
         while (i.hasNext() && this.totMilk <= 24) {
             Box box = (Box) i.next();
             // Go to next box if there is already a box with same ID
-            if(!contentObj.contains(box)){
+            if (!BoxesInStack.contains(box)) {
                 // ***** Total Weight + box Weight < Max Weight *****"
                 if ((totWeight + box.getWeight()) < (maxWeight + 5)) {
                     //***** Total Milk + box Milk <= 24*****"
                     if ((this.totMilk + box.getMilk()) <= 24) {
                         push(box);
-                        contentObj.add(box);
+                        BoxesInStack.add(box);
                         this.totMilk = this.totMilk + box.getMilk();
                         this.totWeight = this.totWeight + box.getWeight();
                         i.remove();
@@ -87,10 +87,14 @@ public class Stack {
         while (i.hasNext() && this.totWeight < (this.maxWeight + 5)) {
             Box box = (Box) i.next();
             // no duplicate ID
-            if(!contentObj.contains(box)){
+            if (!BoxesInStack.contains(box)) {
                 if ((box.getWeight() + totWeight) < this.maxWeight + 5) {
-                    this.totWeight = this.totWeight + box.getWeight();
-                    i.remove();
+                    if ((this.totMilk + box.getMilk()) <= 24) {
+                        push(box);
+                        BoxesInStack.add(box);
+                        this.totWeight = this.totWeight + box.getWeight();
+                        i.remove();
+                    }
                 }
             }
         }
@@ -114,5 +118,13 @@ public class Stack {
 
     public String toString(){
         return ("Total Milk in Stack: " + this.totMilk + "\nTotal Weight in Stack: " + this.totWeight);
+    }
+
+    public String showAll() {
+        String str = "";
+        for (Box box : BoxesInStack) {
+            str = str.concat(box.toString() + " ");
+        }
+        return str;
     }
 }
