@@ -50,6 +50,10 @@ public class Box {
         return new Box(this.milk, this.weight, this.iD);
     }
 
+    public boolean containsMilk(){
+        return this.milk != 0;
+    }
+
     @Override
     public String toString() {
         return System.lineSeparator() + "Box|" +

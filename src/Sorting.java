@@ -19,7 +19,6 @@ public class Sorting {
     static void sortWeightLightFirst(List<Box> list) {
         Collections.sort(list, new Comparator<Box>() {
             public int compare(Box box1, Box box2) {
-                // avoiding NullPointerException in case name is null ? What does this mean
                 double idea1 = box1.getWeight();
                 double idea2 = box2.getWeight();
                 return Double.compare(idea1, idea2);
@@ -30,7 +29,6 @@ public class Sorting {
     static void sortMilkLightFirst(List<Box> list) {
         Collections.sort(list, new Comparator<Box>() {
             public int compare(Box box1, Box box2) {
-                // avoiding NullPointerException in case name is null ? What does this mean
                 double idea1 = box1.getMilk();
                 double idea2 = box2.getMilk();
                 return Double.compare(idea1, idea2);
@@ -41,7 +39,6 @@ public class Sorting {
     static void sortMilkHeavyFirst(List<Box> list) {
         Collections.sort(list, new Comparator<Box>() {
             public int compare(Box box1, Box box2) {
-                // avoiding NullPointerException in case name is null ? What does this mean
                 double idea1 = box1.getMilk();
                 double idea2 = box2.getMilk();
                 return Double.compare(idea2, idea1);
@@ -62,11 +59,6 @@ public class Sorting {
             i.pushBox(OneEachAndMilkList);
         }
 
-        // Process the BoxList
-        //for (Stack i: stackArray) {
-        //    i.pushMilk(BoxList);
-        //}
-        // Sort list heavy weight first
         sortWeightHeavyFirst(BoxList);
         for (Stack i : stackArray) {
             i.pushBox(BoxList);

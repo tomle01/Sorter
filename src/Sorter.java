@@ -126,8 +126,6 @@ public class Sorter {
             while ((line = br.readLine()) != null) {
                 // use comma as separator
                 String[] boxInfo = line.split(cvsSplitBy);
-                // System.out.println("Country [code= " + country[4] + " , name=" + country[5] +
-                // "]");
                 if (!list
                         .add(Sorter.newBox(Integer.parseInt(boxInfo[0]), Double.parseDouble(boxInfo[1]), boxInfo[2]))) {
                     System.out.println("Insert failed");
