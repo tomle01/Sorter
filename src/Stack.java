@@ -1,3 +1,5 @@
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -7,20 +9,15 @@ public class Stack {
     private int top;
     private Box a[] = new Box[MAX]; // Maximum size of Stack
     private double totWeight, totMilk;
-    private ArrayList<Box> BoxesInStack = new ArrayList<>();
-
-    private List<Box> list; private double maxWeight;
-
-    boolean isEmpty() {
-        return (top < 0);
-    }
+    private ArrayList<Box> BoxesInStack = new ArrayList<>(); // Use to store info on what box is in stack
+    private ArrayList<String> idInStack = new ArrayList<>(); // Use to store info on what id is in stack
+    private double maxWeight;
 
     Stack() {
         top = -1;
         totWeight = 0;
         totMilk = 0;
         maxWeight = 0;
-        list = new ArrayList<>();
     }
 
     Stack(List<Box> list, double maxWeight) {
@@ -28,7 +25,10 @@ public class Stack {
         totWeight = 0;
         totMilk = 0;
         this.maxWeight = maxWeight;
-        this.list = list;
+    }
+
+    boolean isEmpty() {
+        return (top < 0);
     }
 
     boolean push(Box x) {
@@ -52,52 +52,142 @@ public class Stack {
     }
 
     /**
-     * Push box with milk into box
+     * Push box with milk into box // Fix logic to continue pushing weight
      */
-    void pushMilk() {
+    void pushBox(List<Box> list) {
         // list should be sorted light weight first
         // ***** List has next, Milk < 24*****");
+        Sorting.sortMilkHeavyFirst(list);
         Iterator i = list.iterator();
-        while (i.hasNext() && this.totMilk <= 24) {
+        // /// DOES NOT STOP WHEN MILK IS FULL ////////
+        while (i.hasNext() && this.totMilk <= 24 && this.totWeight < (this.maxWeight + 5)) {
+            if (this.totMilk == 24) {
+                System.out.println("///////////////Stack has had enough milk//////////////////");
+                break;
+            }
             Box box = (Box) i.next();
             // Go to next box if there is already a box with same ID
-            if (!BoxesInStack.contains(box)) {
-                // ***** Total Weight + box Weight < Max Weight *****"
-                if ((totWeight + box.getWeight()) < (maxWeight + 5)) {
-                    //***** Total Milk + box Milk <= 24*****"
-                    if ((this.totMilk + box.getMilk()) <= 24) {
-                        push(box);
-                        BoxesInStack.add(box);
-                        this.totMilk = this.totMilk + box.getMilk();
-                        this.totWeight = this.totWeight + box.getWeight();
-                        i.remove();
-                    }
-                } else
-                    System.out.println("Cannot add more milk because stack has reached max weight");
+            if (contains(box)) {
+                continue;
+            }
+            idInStack = box.setStackiD(idInStack);
+            if ((totWeight + box.getWeight()) < (maxWeight + 5)) {
+                if ((this.totMilk + box.getMilk()) <= 24) {
+                    push(box);
+                    BoxesInStack.add(box);
+                    System.out.println("Popped Box ID " + box.getiD());
+                    this.totMilk = this.totMilk + box.getMilk();
+                    this.totWeight = this.totWeight + box.getWeight();
+                    i.remove();
+                }
             }
         }
+        Sorting.sortWeightHeavyFirst(list);
+        System.out.println("------------------------------------------------");
+        System.out.println("LIST AFTER SORT WEIGHT FIRST");
+        System.out.println(list.toString());
+        System.out.println("------------------------------------------------");
+        // Put the remaining weight into stacks
+        i = list.iterator();
+        System.out.println("///////////////Begin pushing weighs into full milk Stack//////////////");
+        while (i.hasNext() && this.totWeight < (this.maxWeight + 5)) {
+            Box box = (Box) i.next();
+            // Go to next box if there is already a box with same ID
+            if (contains(box)) {
+                continue;
+            }
+            idInStack = box.setStackiD(idInStack);
+            if ((totWeight + box.getWeight()) < (maxWeight + 5)) {
+                if ((this.totMilk + box.getMilk()) <= 24) {
+                    push(box);
+                    BoxesInStack.add(box);
+                    System.out.println("Popped Box ID " + box.getiD());
+                    this.totMilk = this.totMilk + box.getMilk();
+                    this.totWeight = this.totWeight + box.getWeight();
+                    i.remove();
+                }
+            }
+        }
+
     }
 
     /**
      * Push boxes with weight into the passed in Stack array
      */
-    void pushWeight() {
-        // list should be sorted heavy weight first
-        Iterator i = list.iterator();
-        while (i.hasNext() && this.totWeight < (this.maxWeight + 5)) {
-            Box box = (Box) i.next();
-            // no duplicate ID
-            if (!BoxesInStack.contains(box)) {
-                if ((box.getWeight() + totWeight) < this.maxWeight + 5) {
-                    if ((this.totMilk + box.getMilk()) <= 24) {
-                        push(box);
-                        BoxesInStack.add(box);
-                        this.totWeight = this.totWeight + box.getWeight();
-                        i.remove();
+    // TODO: CHANGE TO BE SIMILAR TO PUSH MILK
+    //void pushWeight(List<Box> list) {
+    // list should be sorted heavy weight first
+    //	Iterator i = list.iterator();
+    //	while (i.hasNext() && this.totMilk <= 24 && this.totWeight < (this.maxWeight + 5)) {
+    //		Box box = (Box) i.next();
+    //		if (contains(box)) {
+    //			continue;
+    //		}
+    //		idInStack = box.setStackiD(idInStack);
+    //		if ((box.getWeight() + totWeight) < this.maxWeight + 5) {
+    //		if ((this.totMilk + box.getMilk()) <= 24) {
+    //				push(box);
+    //				BoxesInStack.add(box);
+    //				this.totMilk = this.totMilk + box.getMilk();
+    //				this.totWeight = this.totWeight + box.getWeight();
+    //				i.remove();
+    //			}
+    //	}
+//
+    //	}
+    //}
+    public String toString() {
+        NumberFormat formatter = new DecimalFormat("#0.00");
+        return ("\nTotal Milk in Stack: " + this.totMilk + "\nTotal Weight in Stack: "
+                + String.format(Double.toString(this.totWeight), "#,00"));
+    }
+
+    public String toFile() {
+        String str = "";
+        for (Box box : BoxesInStack) {
+            str = str.concat(box.toString() + " ");
+        }
+        return str;
+    }
+
+    public String showAll() {
+        String str = "";
+        String str2 = "";
+        for (Box box : BoxesInStack) {
+            str = str.concat(box.toString() + " ");
+        }
+
+        for (String s : idInStack) {
+            str2 = str2.concat(s + " ");
+        }
+        str = str + "\n" + str2 + "\n";
+        return str;
+    }
+
+    private boolean contains(Object box) {
+        if (((Box) box).getiD().endsWith("m"))
+            return false;
+        // Check if object is instance of subclass or class
+        if (box.getClass() == Box.class) {
+            for (String s : idInStack) {
+                if (s.equalsIgnoreCase(((Box) box).getiD())) {
+                    return true;
+                }
+            }
+        } else if (box.getClass() == BigBox.class) {
+            String[] idInBox = ((BigBox) box).getIdContents();
+            for (String s : idInStack) {
+                if (s.equalsIgnoreCase(((BigBox) box).getiD())) {
+                    return true;
+                }
+                for (String s2 : idInBox) {
+                    if (s.equalsIgnoreCase(s2)) {
+                        return true;
                     }
                 }
             }
         }
+        return false;
     }
 
     public double getTotWeight() {
@@ -114,17 +204,5 @@ public class Stack {
 
     public void setTotMilk(double totMilk) {
         this.totMilk = totMilk;
-    }
-
-    public String toString(){
-        return ("Total Milk in Stack: " + this.totMilk + "\nTotal Weight in Stack: " + this.totWeight);
-    }
-
-    public String showAll() {
-        String str = "";
-        for (Box box : BoxesInStack) {
-            str = str.concat(box.toString() + " ");
-        }
-        return str;
     }
 }

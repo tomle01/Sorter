@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Box {
     private double weight;
     private int milk;
@@ -13,10 +15,6 @@ public class Box {
         this.milk = milk;
         this.weight = weight;
         this.iD = iD;
-    }
-
-    public static Box newBox(int m, double w, String i) {
-        return new Box(m, w, i);
     }
 
     public double getWeight() {
@@ -43,24 +41,22 @@ public class Box {
         this.iD = iD;
     }
 
+    public ArrayList<String> setStackiD(ArrayList<String> list) {
+        list.add(this.iD);
+        return list;
+    }
+
     public Box deepCopy() {
         return new Box(this.milk, this.weight, this.iD);
     }
 
     @Override
     public String toString() {
-        return "\nBox|" +
+        return System.lineSeparator() + "Box|" +
                 "iD=" + iD +
                 ", milk=" + milk +
                 ", weight=" + weight +
                 '|';
     }
 
-    // ArrayList uses this method in its contains()
-    public boolean equals(Object box) {
-        Box boxed = (Box) box;
-        if (boxed.getiD().endsWith("m"))
-            return false;
-        else return this.iD.equals(boxed.getiD());
-    }
 }
