@@ -49,13 +49,11 @@ public class Sorting {
     ArrayList listToStack(List<Box> OneEachAndMilkList, List<Box> BoxList, int numberOfBill, double maxWeight) {
         // Create necessary amount of stacks first
         ArrayList<Stack> stackArray = new ArrayList<>();
-        for (int i = 0; i < numberOfBill; i++) {
-            stackArray.add(new Stack(BoxList, maxWeight));
+        for (int i = 1; i <= numberOfBill; i++) {
+            stackArray.add(new Stack(i,BoxList, maxWeight));
         }
         // Deal with OneEachAndMilkList
         for (Stack i : stackArray) {
-            System.out.println("------------------------------------------------------------------\n"
-                    + "Begin pushing box into Stack");
             i.pushBox(OneEachAndMilkList);
         }
 
@@ -63,12 +61,12 @@ public class Sorting {
         for (Stack i : stackArray) {
             i.pushBox(BoxList);
         }
-        int i = 1; // counter
-        for (Stack s : stackArray) {
-            System.out.print("\nInformation for Stack number: " + i);
-            System.out.print(s.toString());
-            i++;
-        }
+        //int i = 1; // counter
+        // for (Stack s : stackArray) {
+        //    System.out.print("\nInformation for Stack number: " + i);
+        //    System.out.print(s.toString());
+        //   i++;
+        //}
         return stackArray;
     }
 }

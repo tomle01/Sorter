@@ -11,7 +11,7 @@ public class Box {
         this.iD = "0";
     }
 
-    public Box(int milk, double weight, String iD) {
+    public Box(String iD, int milk, double weight) {
         this.milk = milk;
         this.weight = weight;
         this.iD = iD;
@@ -47,20 +47,24 @@ public class Box {
     }
 
     public Box deepCopy() {
-        return new Box(this.milk, this.weight, this.iD);
+        return new Box(this.iD, this.milk, this.weight);
     }
 
-    public boolean containsMilk(){
+    public boolean containsMilk() {
         return this.milk != 0;
     }
 
     @Override
     public String toString() {
-        return System.lineSeparator() + "Box|" +
-                "iD=" + iD +
-                ", milk=" + milk +
-                ", weight=" + weight +
-                '|';
+        return
+                //System.out.printf("| %-8s %5s | \n" ,"HC: ", iD) +
+                //System.out.printf("| %-8s %5d |\n","Milk: ", milk) +
+                //System.out.printf("| %-8s %5.2f |\n","Weight: ", weight);
+
+                "----------------" + System.lineSeparator() +
+                "> HC: " + iD + System.lineSeparator() +
+                "> Milk: " + milk  + System.lineSeparator() +
+                "> Weight: " + weight + System.lineSeparator();
     }
 
 }

@@ -19,8 +19,8 @@ public class Sorter {
         double maxWeight;
         ArrayList<Stack> stackArray = new ArrayList<>();
 
-        List<Box> BoxList = new ArrayList<>();
-        List<Box> OneEachList = new ArrayList<>();
+        List<Box> boxList = new ArrayList<>();
+        List<Box> oneEachList = new ArrayList<>();
 
         Sorting sorting = new Sorting();
         do {
@@ -32,22 +32,25 @@ public class Sorter {
             keyboard.nextLine();
             switch (choice) {
                 case 1:
-                    OneEachList = readOneEachList();
-                    BoxList = readBoxList();
+                    oneEachList = readOneEachList();
+                    boxList = readBoxList();
                     break;
                 case 2:
                     // --------------- Done with list ----------------- //
                     System.out.println("How many bills? Max weight each?");
                     numOfBill = keyboard.nextInt();
                     maxWeight = keyboard.nextDouble();
-                    stackArray = sorting.listToStack(OneEachList, BoxList, numOfBill, maxWeight);
+                    stackArray = sorting.listToStack(oneEachList, boxList, numOfBill, maxWeight);
                     sorted = true;
+                    printBoxesRemain(oneEachList, boxList);
+                    exportToFile(stackArray);
+                    if(oneEachList.isEmpty() && boxList.isEmpty()) {
+                        exportToFile(stackArray);
+                        System.out.println("List exported");
+                    }
                     break;
-                case 3: // Work on this later, total weight and milk left does not work
-                    System.out.println("Contents in One Each List: ");
-                    System.out.println(OneEachList.toString());
-                    System.out.println("Contents in Box List: ");
-                    System.out.println(BoxList.toString());
+                case 3:
+                    printBoxesRemain(oneEachList, boxList);
                     break;
                 case 4:
                     if (!sorted)
@@ -62,8 +65,8 @@ public class Sorter {
                     }
                     break;
                 case 5:
-                    BoxList.clear();
-                    OneEachList.clear();
+                    boxList.clear();
+                    oneEachList.clear();
                     sorted = false;
                     break;
                 case 6:
@@ -77,17 +80,17 @@ public class Sorter {
         } while (!exit);
     }
 
-    private static Box newBox(int m, double w, String i) {
-        return new Box(m, w, i);
+    private static Box newBox(String i, int m, double w) {
+        return new Box(i, m, w);
     }
 
-    private static Box newBox(int m, double w, String i, String[] idContents) {
-        return new BigBox(m, w, i, idContents);
+    private static Box newBox(String i, int m, double w, String[] idContents) {
+        return new BigBox(i, m, w, idContents);
     }
 
     private static List readOneEachList() {
         List<Box> list = new ArrayList<>();
-        String csvFile = "C:\\Users\\Asus2017\\Desktop\\Phuc\\Sorter\\src\\OneEachListCSV.csv";
+        String csvFile = "C:\\Users\\Asus2017\\Desktop\\Phuc\\Sorter\\src\\oneEachListCSV.csv";
         String line;
         String cvsSplitBy = ",";
         String idContentsSplitBy = "\\s";
@@ -98,14 +101,14 @@ public class Sorter {
                 // use comma as separator
                 String[] boxInfo = line.split(cvsSplitBy);
                 if (boxInfo.length == 3) {
-                    if (!list.add(
-                            Sorter.newBox(Integer.parseInt(boxInfo[0]), Double.parseDouble(boxInfo[1]), boxInfo[2]))) {
+                    if (!list.add(Sorter.newBox(boxInfo[0], Integer.parseInt(boxInfo[1])
+                            , Double.parseDouble(boxInfo[2])))) {
                         System.out.println("Insert failed");
                     }
                 } else {
                     String[] idContentsInfo = boxInfo[3].split(idContentsSplitBy);
-                    if (!list.add(Sorter.newBox(Integer.parseInt(boxInfo[0]), Double.parseDouble(boxInfo[1]),
-                            boxInfo[2], idContentsInfo))) {
+                    if (!list.add(Sorter.newBox(boxInfo[0], Integer.parseInt(boxInfo[1])
+                            , Double.parseDouble(boxInfo[2]), idContentsInfo))) {
                         System.out.println("Insert failed");
                     }
                 }
@@ -118,7 +121,7 @@ public class Sorter {
 
     private static List readBoxList() {
         List<Box> list = new ArrayList<>();
-        String csvFile = "C:\\Users\\Asus2017\\Desktop\\Phuc\\Sorter\\src\\BoxListCSV.csv";
+        String csvFile = "C:\\Users\\Asus2017\\Desktop\\Phuc\\Sorter\\src\\boxListCSV.csv";
         String line;
         String cvsSplitBy = ",";
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
@@ -126,8 +129,8 @@ public class Sorter {
             while ((line = br.readLine()) != null) {
                 // use comma as separator
                 String[] boxInfo = line.split(cvsSplitBy);
-                if (!list
-                        .add(Sorter.newBox(Integer.parseInt(boxInfo[0]), Double.parseDouble(boxInfo[1]), boxInfo[2]))) {
+                if (!list.add(Sorter.newBox(boxInfo[0], Integer.parseInt(boxInfo[1])
+                        , Double.parseDouble(boxInfo[2])))) {
                     System.out.println("Insert failed");
                 }
             }
@@ -145,9 +148,7 @@ public class Sorter {
             int count = 1;
 
             for (Stack stack : stackArray) {
-                bw.write(System.lineSeparator());
-                bw.write("Stack " + count);
-                bw.write(stack.toFile());
+                bw.write(stack.toFile() + System.lineSeparator());
                 count++;
             }
 
@@ -159,4 +160,17 @@ public class Sorter {
 
     }
 
+    private static void printBoxesRemain(List<Box> oneEachList, List<Box> boxList){
+        if(oneEachList.isEmpty() && boxList.isEmpty()){
+            System.out.println("No box remains");
+        }
+        if(!oneEachList.isEmpty()) {
+            System.out.println("Remains in One Each List: ");
+            System.out.println(oneEachList.toString());
+        }
+        if(!boxList.isEmpty()){
+            System.out.println("Remains in Box List: ");
+            System.out.println(boxList.toString());
+        }
+    }
 }

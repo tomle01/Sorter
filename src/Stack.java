@@ -1,24 +1,29 @@
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class Stack {
+    private static DecimalFormat df2 = new DecimalFormat(".##");
+
     static final int MAX = 20;
-    private int top;
+    private int top, ordinalNumber, totBox, totMilk;
     private Box a[] = new Box[MAX]; // Maximum size of Stack
-    private double totWeight, totMilk;
+    private double totWeight;
     private ArrayList<Box> BoxesInStack = new ArrayList<>(); // Use to store info on what box is in stack
     private ArrayList<String> idInStack = new ArrayList<>(); // Use to store info on what id is in stack
     private double maxWeight;
 
     Stack() {
+        ordinalNumber = -1;
         top = -1;
         totWeight = 0;
         totMilk = 0;
         maxWeight = 0;
     }
 
-    Stack(List<Box> list, double maxWeight) {
+    Stack(int number, List<Box> list, double maxWeight) {
+        this.ordinalNumber = number;
         top = -1;
         totWeight = 0;
         totMilk = 0;
@@ -65,9 +70,9 @@ public class Stack {
             if ((totWeight + box.getWeight()) < (maxWeight + 5)) {
                 if ((this.totMilk + box.getMilk()) <= 24) {
                     push(box);
+                    totBox++;
                     idInStack = box.setStackiD(idInStack);
                     BoxesInStack.add(box);
-                    System.out.println("Popped MILK Box ID " + box.getiD());
                     this.totMilk = this.totMilk + box.getMilk();
                     this.totWeight = this.totWeight + box.getWeight();
                     i.remove();
@@ -76,7 +81,6 @@ public class Stack {
         }
         Sorting.sortWeightHeavyFirst(list);
         i = list.iterator();
-        System.out.println("///////////////Begin pushing weighs into full milk Stack//////////////");
         while (i.hasNext() && this.totWeight < (this.maxWeight + 5)) {
             Box box = (Box) i.next();
             // Go to next box if there is already a box with same ID
@@ -86,9 +90,9 @@ public class Stack {
 
             if ((totWeight + box.getWeight()) < (maxWeight + 5)) {
                 push(box);
+                totBox++;
                 idInStack = box.setStackiD(idInStack);
                 BoxesInStack.add(box);
-                System.out.println("Popped WEIGHT Box ID " + box.getiD());
                 this.totMilk = this.totMilk + box.getMilk();
                 this.totWeight = this.totWeight + box.getWeight();
                 i.remove();
@@ -103,7 +107,9 @@ public class Stack {
     }
 
     public String toFile() {
-        String str = "";
+        String str = "STACK " + ordinalNumber + ":" + System.lineSeparator();
+        str = str.concat("Total Box: " + this.totBox  + "     Total Milk: " + this.totMilk +
+                "     Total Weight: " + df2.format(this.totWeight) + System.lineSeparator());
         for (Box box : BoxesInStack) {
             str = str.concat(box.toString() + " ");
         }
@@ -135,19 +141,14 @@ public class Stack {
                 }
             }
         } else if (box.getClass() == BigBox.class) {
-            System.out.println("------------ COMPARING BIG BOX NUMBER: " + box.toString() + "--------------");
             String[] idInBox = ((BigBox) box).getIdContents();
             for (String s : idInStack) {
                 if (s.equalsIgnoreCase(((BigBox) box).getiD())) {
-                    System.out.println("Big Box equals ID");
                     return true;
                 }
                 // Working as intended
                 for (String s2 : idInBox) {
-                    System.out.println("String s: " + s);
-                    System.out.println("String s2: " + s2);
                     if (s.equalsIgnoreCase(s2)) {
-                        System.out.println(s.equalsIgnoreCase(s2));
                         return true;
                     }
                 }
@@ -168,7 +169,7 @@ public class Stack {
         return totMilk;
     }
 
-    public void setTotMilk(double totMilk) {
+    public void setTotMilk(int totMilk) {
         this.totMilk = totMilk;
     }
 }
