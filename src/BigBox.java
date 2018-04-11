@@ -8,8 +8,8 @@ public class BigBox extends Box {
         this.idContents = idContents;
     }
 
-    public BigBox(int milk, double weight, String iD, String[] idContents) {
-        super(milk, weight, iD);
+    public BigBox(String iD, int milk, double weight, String[] idContents) {
+        super(iD, milk, weight);
         this.idContents = idContents;
     }
 
@@ -34,7 +34,8 @@ public class BigBox extends Box {
     @Override
     public String toString() {
         String str = "";
-        str = System.lineSeparator() + str.concat(super.toString()).concat(" Contents: " + Arrays.toString(idContents));
+        str =  str.concat(super.toString()).concat("> Contents: "
+                + Arrays.toString(idContents) + System.lineSeparator());
         return str;
     }
 }
