@@ -1,7 +1,5 @@
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class Stack {
     private static DecimalFormat df2 = new DecimalFormat(".##");
@@ -54,51 +52,15 @@ public class Stack {
         }
     }
 
-    /**
-     * Push box with milk into box // Fix logic to continue pushing weight
-     */
-    void pushBox(List<Box> list) {
-        // list should be sorted light weight first
-        Sorting.sortMilkHeavyFirst(list);
-        Iterator i = list.iterator();
-        while (i.hasNext() && this.totMilk < 24 && this.totWeight < (this.maxWeight + 5)) {
-            Box box = (Box) i.next();
-            // Go to next box if there is already a box with same ID
-            if (!box.containsMilk() || contains(box)) {
-                continue;
+    static void sortWeightHeavyFirst(List<Box> list) {
+        Collections.sort(list, new Comparator<Box>() {
+            public int compare(Box box1, Box box2) {
+                // avoiding NullPointerException in case name is null ? What does this mean
+                double idea1 = box1.getWeight();
+                double idea2 = box2.getWeight();
+                return Double.compare(idea2, idea1);
             }
-            if ((totWeight + box.getWeight()) < (maxWeight + 5)) {
-                if ((this.totMilk + box.getMilk()) <= 24) {
-                    push(box);
-                    totBox++;
-                    idInStack = box.setStackiD(idInStack);
-                    BoxesInStack.add(box);
-                    this.totMilk = this.totMilk + box.getMilk();
-                    this.totWeight = this.totWeight + box.getWeight();
-                    i.remove();
-                }
-            }
-        }
-        Sorting.sortWeightHeavyFirst(list);
-        i = list.iterator();
-        while (i.hasNext() && this.totWeight < (this.maxWeight + 5)) {
-            Box box = (Box) i.next();
-            // Go to next box if there is already a box with same ID
-            if (box.containsMilk() || contains(box)) {
-                continue;
-            }
-
-            if ((totWeight + box.getWeight()) < (maxWeight + 5)) {
-                push(box);
-                totBox++;
-                idInStack = box.setStackiD(idInStack);
-                BoxesInStack.add(box);
-                this.totMilk = this.totMilk + box.getMilk();
-                this.totWeight = this.totWeight + box.getWeight();
-                i.remove();
-            }
-        }
-
+        });
     }
 
     public String toString() {
@@ -155,6 +117,83 @@ public class Stack {
             }
         }
         return false;
+    }
+
+    static void sortWeightLightFirst(List<Box> list) {
+        Collections.sort(list, new Comparator<Box>() {
+            public int compare(Box box1, Box box2) {
+                double idea1 = box1.getWeight();
+                double idea2 = box2.getWeight();
+                return Double.compare(idea1, idea2);
+            }
+        });
+    }
+
+    static void sortMilkLightFirst(List<Box> list) {
+        Collections.sort(list, new Comparator<Box>() {
+            public int compare(Box box1, Box box2) {
+                double idea1 = box1.getMilk();
+                double idea2 = box2.getMilk();
+                return Double.compare(idea1, idea2);
+            }
+        });
+    }
+
+    static void sortMilkHeavyFirst(List<Box> list) {
+        Collections.sort(list, new Comparator<Box>() {
+            public int compare(Box box1, Box box2) {
+                double idea1 = box1.getMilk();
+                double idea2 = box2.getMilk();
+                return Double.compare(idea2, idea1);
+            }
+        });
+    }
+
+    /**
+     * Push box with milk into box // Fix logic to continue pushing weight
+     */
+    void pushBox(List<Box> list) {
+        // list should be sorted light weight first
+        sortMilkHeavyFirst(list);
+        Iterator i = list.iterator();
+        while (i.hasNext() && this.totMilk < 24 && this.totWeight < (this.maxWeight + 5)) {
+            Box box = (Box) i.next();
+            // Go to next box if there is already a box with same ID
+            if (!box.containsMilk() || contains(box)) {
+                continue;
+            }
+            if ((totWeight + box.getWeight()) < (maxWeight + 5)) {
+                if ((this.totMilk + box.getMilk()) <= 24) {
+                    push(box);
+                    totBox++;
+                    idInStack = box.setStackiD(idInStack);
+                    BoxesInStack.add(box);
+                    this.totMilk = this.totMilk + box.getMilk();
+                    this.totWeight = this.totWeight + box.getWeight();
+                    i.remove();
+                }
+            }
+        }
+        sortWeightHeavyFirst(list);
+        i = list.iterator();
+        while (i.hasNext() && this.totWeight < (this.maxWeight + 5)) {
+            Box box = (Box) i.next();
+            // Go to next box if there is already a box with same ID
+            if (box.containsMilk() || contains(box)) {
+                continue;
+            }
+
+            if ((totWeight + box.getWeight()) < (maxWeight + 5)) {
+                push(box);
+                totBox++;
+                idInStack = box.setStackiD(idInStack);
+                BoxesInStack.add(box);
+                this.totMilk = this.totMilk + box.getMilk();
+                this.totWeight = this.totWeight + box.getWeight();
+                i.remove();
+            }
+        }
+
     }
 
     public double getTotWeight() {
